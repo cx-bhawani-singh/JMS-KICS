@@ -160,7 +160,7 @@ class JobCard extends JFrame implements ActionListener
 	}
 	public void actionPerformed(ActionEvent e)
         {
-               
+
 		String sCustomer_Id = Customer_Id.getText();
                 String sStyle_Id= Style_Id.getText();
        	        String sOrder_Date = Order_Date.getText();
@@ -170,21 +170,36 @@ class JobCard extends JFrame implements ActionListener
                	String sAmount_Pay = Amount_Pay.getText();
                 String sSalesMan = SalesMan.getText();
        	        //String sStatus = com.getText();
-                String query =" INSERT INTO Job_Card(Customer_ID,Style_ID,Order_Date,Due_Date,Estimated_Cost,Remarks,Amount_Advance,Salesman,Current_Status) VALUES ('"+sCustomer_Id+"','"+sStyle_Id+"','"+sOrder_Date+"','"+sDue_Date+"','"+sE_Cost+"','"+sRemark+"','"+sAmount_Pay+"','"+sSalesMan+"','"+com+"')";
+
+		// Fixed SQL Injection vulnerability by using PreparedStatement with parameterized query
+                String query = "INSERT INTO Job_Card(Customer_ID,Style_ID,Order_Date,Due_Date,Estimated_Cost,Remarks,Amount_Advance,Salesman,Current_Status) VALUES (?,?,?,?,?,?,?,?,?)";
 
 		try
 	        {
         		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		        con = DriverManager.getConnection("jdbc:odbc:JMS1");
-			stmt = con.createStatement();
-			int result = stmt.executeUpdate ( query );
+			PreparedStatement pstmt = con.prepareStatement(query);
+
+			// Set parameters using PreparedStatement to prevent SQL injection
+			pstmt.setString(1, sCustomer_Id);
+			pstmt.setString(2, sStyle_Id);
+			pstmt.setString(3, sOrder_Date);
+			pstmt.setString(4, sDue_Date);
+			pstmt.setString(5, sE_Cost);
+			pstmt.setString(6, sRemark);
+			pstmt.setString(7, sAmount_Pay);
+			pstmt.setString(8, sSalesMan);
+			pstmt.setString(9, com);
+
+			int result = pstmt.executeUpdate();
+			pstmt.close();
 		}
 		catch(Exception ae)
               	{
               		ae.printStackTrace();
 	        }
-		
+
 		iFrameJobCard.setVisible(false);
-		//Addenq1 p = new Addenq1();		
+		//Addenq1 p = new Addenq1();
 	}
 }
