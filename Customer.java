@@ -10,6 +10,7 @@ class Customer extends JFrame implements ActionListener
 	
 	Connection con;
         Statement stmt;
+        PreparedStatement pstmt;
         ResultSet rs;
 	LayoutManager lm = null;
 	
@@ -204,14 +205,31 @@ class Customer extends JFrame implements ActionListener
        	        //String sStatus = com.getText();
 
 
-                String query =" INSERT INTO Customer(Date_In,Name,Address,Phone,Wedding_Aniv,Birthday,Ring_Husband,Ring_Wife,Ring_Other,Visits,credit,Style_Id,Remark) VALUES ('"+sDate_In+"','"+sCustomer_Name+"','"+sAddress+"','"+sPhone+"','"+sWedding_Aniv+"','"+sBirthday+"','"+sRing_Husband+"','"+sRing_Wife+"','"+sRing_Other+"','"+sVisits+"','"+scredit+"','"+sStyle_Id+"','"+sRemark+"')";
+                // Use parameterized query to prevent SQL injection
+                String query = "INSERT INTO Customer(Date_In,Name,Address,Phone,Wedding_Aniv,Birthday,Ring_Husband,Ring_Wife,Ring_Other,Visits,credit,Style_Id,Remark) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 		try
 	        {
         		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		        con = DriverManager.getConnection("jdbc:odbc:JMS");
-			stmt = con.createStatement();
-			int result = stmt.executeUpdate ( query );
+			pstmt = con.prepareStatement(query);
+
+			// Set parameters using PreparedStatement to prevent SQL injection
+			pstmt.setString(1, sDate_In);
+			pstmt.setString(2, sCustomer_Name);
+			pstmt.setString(3, sAddress);
+			pstmt.setString(4, sPhone);
+			pstmt.setString(5, sWedding_Aniv);
+			pstmt.setString(6, sBirthday);
+			pstmt.setString(7, sRing_Husband);
+			pstmt.setString(8, sRing_Wife);
+			pstmt.setString(9, sRing_Other);
+			pstmt.setString(10, sVisits);
+			pstmt.setString(11, scredit);
+			pstmt.setString(12, sStyle_Id);
+			pstmt.setString(13, sRemark);
+
+			int result = pstmt.executeUpdate();
 		}
 		catch(Exception ae)
               	{
