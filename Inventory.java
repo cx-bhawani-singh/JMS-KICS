@@ -160,13 +160,14 @@ class Inventory extends JFrame implements ActionListener
        	        String sdetails = details.getText();
 
 		// Use PreparedStatement to prevent SQL injection
-	 	String query = "INSERT INTO Inventory(Style_ID,Vendor_ID,In_Date,Gold,Gold_wt,Stone_Type,Stone_Weight,Stone_numbers,Details) VALUES (?,?,?,?,?,?,?,?,?)";
+	 	String query =" INSERT INTO Inventory(Style_ID,Vendor_ID,In_Date,Gold,Gold_wt,Stone_Type,Stone_Weight,Stone_numbers,Details) VALUES (?,?,?,?,?,?,?,?,?)";
+                //System.out.println("Query ="+query);
 		try
 	        {
         		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		        con = DriverManager.getConnection("jdbc:odbc:JMS");
 			PreparedStatement pstmt = con.prepareStatement(query);
-			// Set parameters using PreparedStatement to safely handle user input
+			// Set parameters using parameterized queries to prevent SQL injection
 			pstmt.setString(1, sstyle_id);
 			pstmt.setString(2, sVendor_id);
 			pstmt.setString(3, sin_date);
@@ -177,7 +178,6 @@ class Inventory extends JFrame implements ActionListener
 			pstmt.setString(8, sstone_number);
 			pstmt.setString(9, sdetails);
 			int result = pstmt.executeUpdate();
-			pstmt.close();
 		}
 		catch(Exception ae)
               	{
