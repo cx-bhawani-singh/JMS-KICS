@@ -1,4 +1,4 @@
-#ATR1-change FR
+#ATR12
 import java.sql.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -237,9 +237,11 @@ class Billing extends JFrame implements ActionListener
 			System.out.println("sCustomer_Id="+sCustomer_Id);
 			try
 			{
-				String qCustom = "SELECT Customer_ID FROM Job_Card WHERE Customer_ID = '"+sCustomer_Id+"'";
-				stmtCustom = con.createStatement();
-				res = stmtCustom.executeQuery ( qCustom );
+				// Use PreparedStatement to prevent SQL injection
+				String qCustom = "SELECT Customer_ID FROM Job_Card WHERE Customer_ID = ?";
+				PreparedStatement pstmtCustom = con.prepareStatement(qCustom);
+				pstmtCustom.setString(1, sCustomer_Id);
+				res = pstmtCustom.executeQuery();
 				System.out.println("the res = "+res);
 				if(!(res.next()))
 				{
