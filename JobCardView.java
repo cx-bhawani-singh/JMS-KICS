@@ -15,7 +15,7 @@ class JobCardView extends JPanel implements ActionListener
 
 	public JTable table;
 	Connection con;
-        Statement stmt;
+        PreparedStatement pstmt;
         ResultSet rs;
 	LayoutManager lm = null;
 	String com = new String("Job_Card_ID");
@@ -79,43 +79,78 @@ class JobCardView extends JPanel implements ActionListener
 	}
 	public void actionPerformed(ActionEvent e)
 	{	//setVisible(false);
-		String str = tf.getText();	
-		
+		String str = tf.getText();
+
 		String query;
 		String str1=null;
-				
-		
-		if(!str.equals(""))
-		{
-			if(com.equals("Job_Card_ID"))
-			{
-				int inventstr = Integer.parseInt(str);
-				query = "SELECT * FROM Job_Card E WHERE E."+com+" = "+inventstr;
-			}	
-			else	
-	 		{
-				str1 = "'"+str+"'";
-				query = "SELECT * FROM Job_Card E WHERE E."+com+" = "+str1;
+
+		// Whitelist valid column names to prevent SQL injection via column name
+		String[] validColumns = {
+			"Job_Card_ID", "Style_ID", "Details", "Vendor_Name", "Vendor_ID",
+			"In_Date", "Gold", "Gold_wt", "Stone_Type", "Stone_Weight",
+			"Stone_numbers", "Stone_Wt", "Stone_Name", "Current_status"
+		};
+
+		// Validate that the selected column is in the whitelist
+		boolean isValidColumn = false;
+		for (String validCol : validColumns) {
+			if (validCol.equals(com)) {
+				isValidColumn = true;
+				break;
 			}
-			
-		}	
-		else
-		{
-			query = "SELECT * FROM Job_Card";
 		}
-		System.out.println(str1);
+
+		if (!isValidColumn) {
+			System.out.println("Invalid column name: " + com);
+			return;
+		}
+
 		try{
-			stmt = con.createStatement();
-			System.out.println(query);
-			rs = stmt.executeQuery(query);
+			if(!str.equals(""))
+			{
+				// Use PreparedStatement with parameterized query to prevent SQL injection
+				// Column name is validated against whitelist, so safe to use in query
+				query = "SELECT * FROM Job_Card E WHERE E." + com + " = ?";
+				pstmt = con.prepareStatement(query);
+
+				if(com.equals("Job_Card_ID"))
+				{
+					// For Job_Card_ID, convert to integer and set as parameter
+					int inventstr = Integer.parseInt(str);
+					pstmt.setInt(1, inventstr);
+				}
+				else
+		 		{
+					// For other columns, set string parameter
+					str1 = str;
+					pstmt.setString(1, str1);
+				}
+
+				System.out.println(str1);
+				System.out.println(query);
+				rs = pstmt.executeQuery();
+			}
+			else
+			{
+				// No filter - retrieve all records
+				query = "SELECT * FROM Job_Card";
+				pstmt = con.prepareStatement(query);
+				rs = pstmt.executeQuery();
+			}
+
 			displayResultSet(rs);
-			stmt.close();
+			pstmt.close();
 		}
 		catch(SQLException sqlx)
 		{
 			sqlx.printStackTrace();
 		}
-		
+		catch(NumberFormatException nfe)
+		{
+			System.out.println("Invalid number format for Job_Card_ID");
+			nfe.printStackTrace();
+		}
+
 	}
 	public void displayResultSet(ResultSet rs1)throws SQLException
 	{
