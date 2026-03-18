@@ -74,43 +74,69 @@ class InventoryView extends JPanel implements ActionListener
 	}
 	public void actionPerformed(ActionEvent e)
 	{	//setVisible(false);
-		String str = tf.getText();	
-		
+		String str = tf.getText();
+
 		String query;
-		String str1=null;
-				
-		
+		PreparedStatement pstmt = null;
+
+
 		if(!str.equals(""))
 		{
-			if(com.equals("Inventory_ID"))
-			{
-				int inventstr = Integer.parseInt(str);
-				query = "SELECT * FROM Inventory E WHERE E."+com+" = "+inventstr;
-			}	
-			else	
-	 		{
-				str1 = "'"+str+"'";
-				query = "SELECT * FROM Inventory E WHERE E."+com+" = "+str1;
+			// Use PreparedStatement to prevent SQL injection
+			query = "SELECT * FROM Inventory E WHERE E."+com+" = ?";
+
+			try{
+				pstmt = con.prepareStatement(query);
+
+				// Set parameter based on field type
+				if(com.equals("Inventory_ID"))
+				{
+					int inventstr = Integer.parseInt(str);
+					pstmt.setInt(1, inventstr);
+				}
+				else
+		 		{
+					pstmt.setString(1, str);
+				}
+
+				System.out.println(query);
+				rs = pstmt.executeQuery();
+				displayResultSet(rs);
+				pstmt.close();
 			}
-			
-		}	
+			catch(SQLException sqlx)
+			{
+				sqlx.printStackTrace();
+			}
+			finally
+			{
+				try
+				{
+					if(pstmt != null) pstmt.close();
+				}
+				catch(SQLException e2)
+				{
+					e2.printStackTrace();
+				}
+			}
+		}
 		else
 		{
+			// When no search filter, retrieve all records
 			query = "SELECT * FROM Inventory";
+			try{
+				stmt = con.createStatement();
+				System.out.println(query);
+				rs = stmt.executeQuery(query);
+				displayResultSet(rs);
+				stmt.close();
+			}
+			catch(SQLException sqlx)
+			{
+				sqlx.printStackTrace();
+			}
 		}
-		System.out.println(str1);
-		try{
-			stmt = con.createStatement();
-			System.out.println(query);
-			rs = stmt.executeQuery(query);
-			displayResultSet(rs);
-			stmt.close();
-		}
-		catch(SQLException sqlx)
-		{
-			sqlx.printStackTrace();
-		}
-		
+
 	}
 	public void displayResultSet(ResultSet rs1)throws SQLException
 	{
