@@ -11,6 +11,7 @@ class Vendor extends JFrame implements ActionListener
 	
 	Connection con;
         Statement stmt;
+        PreparedStatement pstmt;
         ResultSet rs;
 	LayoutManager lm = null;
 	
@@ -154,21 +155,34 @@ class Vendor extends JFrame implements ActionListener
                 String sCargo_Name = Cargo_Name.getText();
        	        String sRemark = Remark.getText();
 		String sDate_In = Date_In.getText();
-		
-                String query =" INSERT INTO Vendor (Vendor_name,Contact_Person,Phone,Fax,Mobile,email,Cargo_Name,Remark,Date_In) VALUES ('"+sVendor_Name+"','"+sContact_Person+"','"+sPhone+"','"+sFax+"','"+sMobile+"','"+semail+"','"+sCargo_Name+"','"+sRemark+"','"+sDate_In+"')";
+
+		// Use PreparedStatement to prevent SQL injection
+                String query = "INSERT INTO Vendor (Vendor_name,Contact_Person,Phone,Fax,Mobile,email,Cargo_Name,Remark,Date_In) VALUES (?,?,?,?,?,?,?,?,?)";
 
 		try
 	        {
         		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		        con = DriverManager.getConnection("jdbc:odbc:JMS1");
-			stmt = con.createStatement();
-			int result = stmt.executeUpdate ( query );
+
+			// Use PreparedStatement with parameterized query
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, sVendor_Name);
+			pstmt.setString(2, sContact_Person);
+			pstmt.setString(3, sPhone);
+			pstmt.setString(4, sFax);
+			pstmt.setString(5, sMobile);
+			pstmt.setString(6, semail);
+			pstmt.setString(7, sCargo_Name);
+			pstmt.setString(8, sRemark);
+			pstmt.setString(9, sDate_In);
+
+			int result = pstmt.executeUpdate();
 		}
 		catch(Exception ae)
               	{
               		ae.printStackTrace();
 	        }
 		iFrameVendor.setVisible(false);
-		//Addenq1 p = new Addenq1();		
+		//Addenq1 p = new Addenq1();
 	}
 }
