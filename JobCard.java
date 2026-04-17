@@ -170,7 +170,6 @@ class JobCard extends JFrame implements ActionListener
                	String sAmount_Pay = Amount_Pay.getText();
                 String sSalesMan = SalesMan.getText();
        	        //String sStatus = com.getText();
-
                 // Use PreparedStatement to prevent SQL injection
                 String query = "INSERT INTO Job_Card(Customer_ID,Style_ID,Order_Date,Due_Date,Estimated_Cost,Remarks,Amount_Advance,Salesman,Current_Status) VALUES (?,?,?,?,?,?,?,?,?)";
 
@@ -178,9 +177,9 @@ class JobCard extends JFrame implements ActionListener
 	        {
         		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		        con = DriverManager.getConnection("jdbc:odbc:JMS1");
+			// Use PreparedStatement instead of Statement to prevent SQL injection
 			PreparedStatement pstmt = con.prepareStatement(query);
-
-			// Set parameters using PreparedStatement to prevent SQL injection
+			// Set parameters using PreparedStatement setters - this escapes special characters automatically
 			pstmt.setString(1, sCustomer_Id);
 			pstmt.setString(2, sStyle_Id);
 			pstmt.setString(3, sOrder_Date);
@@ -190,9 +189,7 @@ class JobCard extends JFrame implements ActionListener
 			pstmt.setString(7, sAmount_Pay);
 			pstmt.setString(8, sSalesMan);
 			pstmt.setString(9, com);
-
 			int result = pstmt.executeUpdate();
-			pstmt.close();
 		}
 		catch(Exception ae)
               	{
