@@ -130,36 +130,43 @@ class LoginAdd extends JFrame implements ActionListener
 	}
 	public void actionPerformed(ActionEvent e)
         {
-               
+
 		String sPassword = Password.getText();
 		String sPasswordC = PasswordC.getText();
-		
+
 		if(sPassword.equals(sPasswordC))
-		{		
+		{
 			String sUser = User.getText();
 			String sName = Name.getText();
 			String sType = com;
 			String sContact = Contact.getText();
-			
-			String query =" INSERT INTO Login(User,Password,Type,Name,Contact) VALUES ('"+sUser+"','"+sPassword+"','"+sType+"','"+sName+"','"+sContact+"')";
+
+			// Use PreparedStatement to prevent SQL injection
+			String query = "INSERT INTO Login(User,Password,Type,Name,Contact) VALUES (?,?,?,?,?)";
 			try
 	        {
-        		stmt = con.createStatement();
-        		int result = stmt.executeUpdate ( query );
+        		PreparedStatement pstmt = con.prepareStatement(query);
+        		// Set parameters using PreparedStatement to safely handle user input
+        		pstmt.setString(1, sUser);
+        		pstmt.setString(2, sPassword);
+        		pstmt.setString(3, sType);
+        		pstmt.setString(4, sName);
+        		pstmt.setString(5, sContact);
+        		int result = pstmt.executeUpdate();
 	        }
 			catch(Exception ae)
         	    {
               		ae.printStackTrace();
 	        }
-		
+
 			iFrameLogin.setVisible(false);
 		}
 		else
 		{
 			JOptionPane.showMessageDialog(this,"Password Do not Match Try Again.");
-			return;	
+			return;
 		}
-		
-	
+
+
        }
 }
