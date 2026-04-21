@@ -178,9 +178,9 @@ class JobCard extends JFrame implements ActionListener
 	        {
         		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		        con = DriverManager.getConnection("jdbc:odbc:JMS1");
-			PreparedStatement pstmt = con.prepareStatement(query);
 
-			// Set parameters using PreparedStatement to prevent SQL injection
+			// Use PreparedStatement with parameterized query
+			PreparedStatement pstmt = con.prepareStatement(query);
 			pstmt.setString(1, sCustomer_Id);
 			pstmt.setString(2, sStyle_Id);
 			pstmt.setString(3, sOrder_Date);
