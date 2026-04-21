@@ -10,6 +10,7 @@ class JobCard extends JFrame implements ActionListener
 	
 	Connection con;
         Statement stmt;
+        PreparedStatement pstmt;
         ResultSet rs;
 	LayoutManager lm = null;
 	
@@ -178,9 +179,9 @@ class JobCard extends JFrame implements ActionListener
 	        {
         		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		        con = DriverManager.getConnection("jdbc:odbc:JMS1");
-			PreparedStatement pstmt = con.prepareStatement(query);
+			pstmt = con.prepareStatement(query);
 
-			// Set parameters using PreparedStatement to prevent SQL injection
+			// Set all parameters using PreparedStatement to prevent SQL injection
 			pstmt.setString(1, sCustomer_Id);
 			pstmt.setString(2, sStyle_Id);
 			pstmt.setString(3, sOrder_Date);
@@ -192,7 +193,6 @@ class JobCard extends JFrame implements ActionListener
 			pstmt.setString(9, com);
 
 			int result = pstmt.executeUpdate();
-			pstmt.close();
 		}
 		catch(Exception ae)
               	{
